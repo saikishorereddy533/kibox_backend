@@ -1,4 +1,4 @@
-import { registerUser } from "../services/user.service.js";
+import { registerUser } from "../services/user.signup.service.js";
 
 export const signupUser = async (req, res) => {
   try {
