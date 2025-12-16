@@ -1,7 +1,6 @@
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import { findUserByEmail } from "../repositories/user.repository.js";
-import { JWT_SECRET } from "../config/server.config.js";
+import { generateToken } from "../utils/jwt.utils.js";
 
 export const loginUser = async ({ email, password }) => {
 
@@ -17,11 +16,10 @@ export const loginUser = async ({ email, password }) => {
   }
 
   
-  const token = jwt.sign(
-    { userId: user._id, email: user.email },
-    JWT_SECRET,
-    { expiresIn: "7d" }
-  );
+  const token = generateToken({
+    userId: user._id,
+    email: user.email
+  });
 
   return { user, token };
 };
