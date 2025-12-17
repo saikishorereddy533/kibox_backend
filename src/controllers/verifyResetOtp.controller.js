@@ -2,24 +2,34 @@ import { verifyOtpService } from "../services/verifyOtp.service.js";
 import logger from "../utils/logger.js";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../config/server.config.js";
+import { StatusCodes } from "http-status-codes";
+
 export const verifyResetOtp = async (req, res) => {
   try {
     const { email, otp } = req.body;
 
     if (!email || !otp) {
-      return res.status(400).json({ message: "Email and OTP are required" });
+      logger.warn("Reset OTP verification failed: missing email or otp");
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ message: "Email and OTP are required" });
     }
 
     // Verify OTP using generic service
     const { user } = await verifyOtpService({
-        email,
-        otp,
-        purpose: "PASSWORD_RESET",
-        onVerified: async (user) => user // optional
+      email,
+      otp,
+      purpose: "PASSWORD_RESET",
+      onVerified: async (user) => user // optional, do nothing
     });
 
-    
-    logger.info(user._id);
+    if (!user) {
+      logger.warn(`Reset OTP verification failed: user not found for email ${email}`);
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ message: "Invalid OTP or user not found" });
+    }
+
     // Generate short-lived JWT reset token
     const resetToken = jwt.sign(
       { userId: user._id, purpose: "PASSWORD_RESET" },
@@ -27,13 +37,16 @@ export const verifyResetOtp = async (req, res) => {
       { expiresIn: "20m" }
     );
 
-    res.status(200).json({
+    logger.info(`Reset OTP verified successfully for email: ${email}`);
+    return res.status(StatusCodes.OK).json({
       message: "OTP verified successfully",
       resetToken
     });
 
   } catch (err) {
-    logger.error(`Reset OTP verification failed: ${err.message}`);
-    res.status(400).json({ message: err.message });
+    logger.error(`Reset OTP verification failed for email ${req.body.email}: ${err.message}`);
+    return res
+      .status(StatusCodes.BAD_REQUEST)
+      .json({ message: err.message });
   }
 };

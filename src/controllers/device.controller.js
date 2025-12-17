@@ -1,5 +1,5 @@
 import { updateDeviceWeightService } from "../services/device.service.js";
-
+import { StatusCodes } from "http-status-codes";
 export const updateWeight = async (req, res) => {
   try {
     const { deviceId, weight } = req.body;
@@ -14,6 +14,6 @@ export const updateWeight = async (req, res) => {
       data
     });
   } catch (err) {
-    res.status(400).json({ success: false, message: err.message });
+    res.status(StatusCodes.BAD_REQUEST).json({ success: false, message: err.message });
   }
 };
