@@ -1,5 +1,5 @@
 // repositories/box.repository.js
-import Box from "../models/Box.js";
+import Box from "../models/Box.model.js";
 
 class BoxRepository {
     async create(data) {

@@ -17,13 +17,9 @@ const boxSchema = new mongoose.Schema(
             type: String,
             default: "KIBOX_V1"
         },
-
-        // Permanent token stored in device & QR
-        deviceToken: {
-            type: String,
-            required: true,
-            unique: true,
-            index: true
+        maxWeight: {
+            type: Number,
+            required: true
         },
 
         // Ownership

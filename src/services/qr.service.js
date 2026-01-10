@@ -1,34 +1,25 @@
 import boxRepository from "../repositories/box.repository.js";
-import { generateBoxId, generateDeviceToken } from "../newBox/token.util.js";
-import { generateQr } from "../utils/qr.util.js";
+import { generateBoxId } from "../utils/newBox.token.utils.js";
 
 class BoxService {
-    async manufactureBox() {
+    async manufactureBox(maxWeight) {
         const boxId = generateBoxId();
-        const deviceToken = generateDeviceToken();
 
         const box = await boxRepository.create({
             boxId,
-            deviceToken
+            maxWeight,
         });
 
-        const qrCode = await generateQr({
-            boxId: box.boxId,
-            token: deviceToken
-        });
 
         return {
             boxId: box.boxId,
-            deviceToken,
-            qrCode // base64 → printable
         };
     }
 
-    async registerBox({ boxId, token, userId, name }) {
+    async registerBox({ boxId, userId, name }) {
         const box = await boxRepository.findByBoxId(boxId);
 
         if (!box) throw new Error("BOX_NOT_FOUND");
-        if (box.deviceToken !== token) throw new Error("INVALID_TOKEN");
         if (box.assignedTo) throw new Error("BOX_ALREADY_ASSIGNED");
 
         return boxRepository.assignBox(boxId, userId, name);

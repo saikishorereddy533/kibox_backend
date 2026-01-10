@@ -2,23 +2,22 @@
 import qrService from "../services/qr.service.js";
 
 export const manufactureBox = async (req, res) => {
-    const result = await qrService.manufactureBox();
+    const { maxWeight } = req.body;
+    const result = await qrService.manufactureBox(maxWeight);
 
     res.status(201).json({
         success: true,
         boxId: result.boxId,
-        qrCode: result.qrCode
     });
 };
 
 export const registerBox = async (req, res) => {
-    const { boxId, token, name } = req.body;
+    const { boxId, name, userId } = req.body;
 
     const box = await qrService.registerBox({
         boxId,
-        token,
         name,
-        userId: req.user.id
+        userId
     });
 
     res.json({
