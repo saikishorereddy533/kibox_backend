@@ -40,7 +40,11 @@ const boxSchema = new mongoose.Schema(
         isActive: {
             type: Boolean,
             default: true
-        }
+        },
+        alertBelowWeight: {
+            type: Number,
+            default: null // grams
+        },
     },
     { timestamps: true }
 );
