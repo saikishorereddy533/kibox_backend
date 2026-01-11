@@ -1,26 +1,32 @@
+// models/Box.model.js
 import mongoose from "mongoose";
 
 const boxSchema = new mongoose.Schema(
     {
+        // Identity
         boxId: {
             type: String,
             required: true,
             unique: true,
             index: true
         },
-
-        name: {
-            type: String // user given name like "Rice Box"
-        },
-
         model: {
             type: String,
             default: "KIBOX_V1"
         },
+
+        // Manufacturing config
         maxWeight: {
             type: Number,
             required: true
         },
+        name: {
+            type: String,
+            default: ""
+        },
+        // Runtime state
+        currentWeight: Number,
+        lastReportedAt: Date,
 
         // Ownership
         assignedTo: {
@@ -28,10 +34,13 @@ const boxSchema = new mongoose.Schema(
             ref: "User",
             default: null
         },
+        assignedAt: Date,
 
-        assignedAt: {
-            type: Date
-        },
+        // System state
+        isActive: {
+            type: Boolean,
+            default: true
+        }
     },
     { timestamps: true }
 );

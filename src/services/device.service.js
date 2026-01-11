@@ -1,12 +1,26 @@
-import { upsertDeviceWeight } from "../repositories/deviceWeight.repository.js";
+import boxRepository from "../repositories/box.repository.js";
 
-export const updateDeviceWeightService = async ({ deviceId, weight }) => {
-  const result = await upsertDeviceWeight(deviceId, weight);
-    // console.log(result)
-  const isFirstTime = !result?.lastErrorObject?.updatedExisting;
+export const updateDeviceWeightService = async ({ boxId, weight }) => {
+  if (!boxId || !weight || typeof weight !== "number") {
+    throw new Error("INVALID_PAYLOAD");
+  }
+
+  const box = await boxRepository.findByBoxId(boxId);
+  if (!box) throw new Error("BOX_NOT_FOUND");
+
+  if (!box.assignedTo) throw new Error("BOX_NOT_REGISTERED");
+
+  box.currentWeight = weight;
+  box.lastReportedAt = new Date();
+
+  await box.save();
+
+  const exceeded = weight > box.maxWeight;
 
   return {
-    isFirstTime,
-    data: result.value
+    boxId: box.boxId,
+    currentWeight: box.currentWeight,
+    maxWeight: box.maxWeight,
+    exceeded
   };
 };

@@ -12,16 +12,44 @@ export const manufactureBox = async (req, res) => {
 };
 
 export const registerBox = async (req, res) => {
-    const { boxId, name, userId } = req.body;
+    try {
+        const { boxId, name, userId } = req.body;
 
-    const box = await qrService.registerBox({
-        boxId,
-        name,
-        userId
-    });
+        // 1️⃣ Basic request validation
+        if (!boxId || !userId) {
+            return res.status(400).json({
+                success: false,
+                message: "boxId and userId are required"
+            });
+        }
 
-    res.json({
-        success: true,
-        box
-    });
+        // 2️⃣ Call service layer
+        const box = await qrService.registerBox({
+            boxId,
+            name,
+            userId
+        });
+
+        // 3️⃣ Success response
+        return res.status(200).json({
+            success: true,
+            box
+        });
+
+    } catch (error) {
+        // 4️⃣ Error mapping
+        const errorMap = {
+            USER_NOT_FOUND: { status: 404, message: "User not found" },
+            BOX_NOT_FOUND: { status: 404, message: "Box not found" },
+            BOX_ALREADY_ASSIGNED: { status: 409, message: "Box already registered" },
+            BOX_ASSIGNMENT_FAILED: { status: 500, message: "Box assignment failed" }
+        };
+
+        const mappedError = errorMap[error.message];
+        console.log(error.message)
+        return res.status(mappedError?.status || 500).json({
+            success: false,
+            message: mappedError?.message || "Internal server error"
+        });
+    }
 };

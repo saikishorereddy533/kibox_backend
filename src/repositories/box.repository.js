@@ -25,6 +25,8 @@ class BoxRepository {
             { new: true }
         );
     }
+
+
 }
 
 export default new BoxRepository();
