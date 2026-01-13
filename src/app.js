@@ -10,6 +10,9 @@ app.use(express.urlencoded({extended:true}));
 app.use(cors());
 
 app.use("/api/v1", v1Router);
+app.get("/",(req,res)=>{
+    res.status(200).send("hello");
+})
 app.get("/health/ping",(req,res)=>{
     res.status(200).json({"message":"pong"});
 })
